@@ -1,14 +1,14 @@
 /* ───────────────── Thème ───────────────── */
 
 :root {
-  --bg: #fbfaf4;
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f4f3ec;
-  --card: #f6f5f0;
+  --surface-2: #f6f6f2;
+  --card: #f8f8f5;
   --ink: #141413;
   --ink-soft: #2b2a27;
   --muted: #6c6a62;
-  --border: #e8e6dc;
+  --border: #ecebe4;
   --lime: #e3f26b;
   --lime-soft: #f3f9c8;
   --orange: #f2622e;
