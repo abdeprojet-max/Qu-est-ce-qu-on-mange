@@ -299,7 +299,7 @@ export function formatQuantity(qty: number, unit: Unit): string {
 export function formatRecipeQuantity(qty: number, unit: Unit): string {
   let rounded: number;
   if (unit === 'g' || unit === 'ml') rounded = Math.max(1, qty >= 20 ? Math.round(qty / 5) * 5 : Math.round(qty));
-  else if (unit === 'pièce' || unit === 'gousse') rounded = qty >= 3 ? Math.round(qty) : Math.max(0.25, Math.round(qty * 4) / 4);
+  else if (unit === 'pièce' || unit === 'gousse') rounded = qty >= 3 ? Math.round(qty) : qty >= 1 ? Math.round(qty * 2) / 2 : Math.max(0.25, Math.round(qty * 4) / 4);
   else rounded = Math.max(0.5, Math.round(qty * 2) / 2);
   return formatQuantity(rounded, unit);
 }

@@ -14,8 +14,11 @@ Application web qui propose des **menus sur plusieurs jours** et génère automa
 - **Fiche recette** avec les quantités ajustées et les étapes.
 - **Liste de courses** regroupée par rayon, à cocher, à copier ou imprimer.
 - **Suivi nutritionnel** : calories, protéines, glucides et lipides par jour et en moyenne.
+- **Profil personnel** : sexe, âge, taille, poids, activité et poids visé. Les calories des menus sont calculées automatiquement (formule de Mifflin-St Jeor) et l'IMC et les protéines conseillées sont affichés.
+- **Suivi du poids** : pesées datées et courbe d'évolution avec l'objectif.
+- **Comptes utilisateurs** (optionnel, via Supabase) : menus, liste de courses, profil et pesées synchronisés sur tous les appareils.
 
-Les préférences, le menu et les cases cochées sont mémorisés dans le navigateur.
+Sans compte, tout est enregistré dans le navigateur.
 
 > Les valeurs nutritionnelles sont des estimations indicatives et ne remplacent pas l'avis d'un professionnel de santé.
 
@@ -30,6 +33,21 @@ npm test         # tests unitaires
 npm run build    # version de production dans dist/
 ```
 
+## Activer les comptes utilisateurs (Supabase)
+
+L'app fonctionne sans cette étape. Pour activer la connexion :
+
+1. Créez un compte gratuit sur [supabase.com](https://supabase.com), puis **New project**.
+2. Dans le projet : **SQL Editor → New query**, collez le contenu de [`supabase/schema.sql`](supabase/schema.sql) et cliquez sur **Run**.
+3. **Authentication → URL Configuration** : mettez l'adresse de votre site Vercel dans **Site URL** (ex. `https://qu-est-ce-qu-on-mange.vercel.app`) et ajoutez-la aussi dans **Redirect URLs**.
+4. **Project Settings → API** : copiez la **Project URL** et la clé **anon public**.
+5. Sur Vercel : **Settings → Environment Variables**, ajoutez :
+   - `VITE_SUPABASE_URL` = la Project URL
+   - `VITE_SUPABASE_ANON_KEY` = la clé anon public
+6. Redéployez sur Vercel (**Deployments → ⋯ → Redeploy**).
+
+La clé « anon » peut être publique : chaque utilisateur n'a accès qu'à ses propres données grâce aux règles de sécurité (RLS) créées à l'étape 2.
+
 ## Organisation du code
 
 | Fichier | Rôle |
@@ -38,7 +56,15 @@ npm run build    # version de production dans dist/
 | `src/data/ingredients.ts` | Catalogue des ingrédients : unité et rayon du magasin |
 | `src/data/labels.ts` | Libellés affichés (cuisines, régimes, objectifs) |
 | `src/lib/planner.ts` | Génération des menus, portions, liste de courses, nutrition |
+| `src/lib/profile.ts` | Calcul des besoins (métabolisme, calories, protéines, IMC) |
+| `src/lib/useCloudSync.ts` | Connexion et synchronisation avec Supabase |
+| `src/data/visuals.ts` | Illustrations des plats et emplacement pour vos photos |
+| `supabase/schema.sql` | Table et règles de sécurité de la base de données |
 | `src/components/` | Interface (préférences, menus, courses, nutrition, fiche recette) |
+
+### Ajouter des photos de plats
+
+Déposez une image dans `public/photos/` (ex. `public/photos/yassa-poulet.jpg`), puis dans `src/data/visuals.ts` ajoutez `'yassa-poulet': '/photos/yassa-poulet.jpg'` à `RECIPE_PHOTOS`. Utilisez des photos dont vous avez les droits.
 
 ### Ajouter une recette
 

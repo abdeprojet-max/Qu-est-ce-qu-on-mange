@@ -8,26 +8,27 @@ interface Props {
   onChange: (s: Settings) => void;
   onGenerate: () => void;
   dirty: boolean;
+  /** Calories calculées automatiquement depuis le profil (champ verrouillé). */
+  kcalFromProfile: boolean;
+  onOpenProfile: () => void;
 }
 
 function toggle<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
-export function SettingsPanel({ settings: s, onChange, onGenerate, dirty }: Props) {
+export function SettingsPanel({ settings: s, onChange, onGenerate, dirty, kcalFromProfile, onOpenProfile }: Props) {
   const set = <K extends keyof Settings>(key: K, value: Settings[K]) => onChange({ ...s, [key]: value });
   const [excludedText, setExcludedText] = useState(s.excludedIngredients.join(', '));
 
   return (
     <form
-      className="panel settings"
+      className="settings"
       onSubmit={(e) => {
         e.preventDefault();
         onGenerate();
       }}
     >
-      <h2>Mes préférences</h2>
-
       <div className="row">
         <label className="field">
           <span>Durée</span>
@@ -86,7 +87,7 @@ export function SettingsPanel({ settings: s, onChange, onGenerate, dirty }: Prop
                 type="radio"
                 name="goal"
                 checked={s.goal === g}
-                onChange={() => onChange({ ...s, goal: g, dailyKcal: GOALS[g].defaultKcal })}
+                onChange={() => onChange({ ...s, goal: g, dailyKcal: kcalFromProfile ? s.dailyKcal : GOALS[g].defaultKcal })}
               />
               <strong>{GOALS[g].label}</strong>
               <small>{GOALS[g].description}</small>
@@ -101,13 +102,26 @@ export function SettingsPanel({ settings: s, onChange, onGenerate, dirty }: Prop
             max={4500}
             step={50}
             value={s.dailyKcal}
+            disabled={kcalFromProfile}
             onChange={(e) => set('dailyKcal', Math.min(4500, Math.max(1200, Number(e.target.value) || 0)))}
           />
         </label>
+        <p className="hint">
+          {kcalFromProfile ? (
+            <>Calculées automatiquement depuis votre profil. </>
+          ) : (
+            <>Renseignez votre profil pour un calcul personnalisé. </>
+          )}
+          <button type="button" className="link" onClick={onOpenProfile}>
+            {kcalFromProfile ? 'Modifier le profil' : 'Créer mon profil'}
+          </button>
+        </p>
       </fieldset>
 
       <fieldset>
-        <legend>Cuisines préférées <small>(aucune = toutes)</small></legend>
+        <legend>
+          Cuisines préférées <small>(aucune = toutes)</small>
+        </legend>
         <div className="chips">
           {(Object.keys(CUISINE_LABELS) as Cuisine[]).map((c) => (
             <label key={c} className="chip">
@@ -123,11 +137,7 @@ export function SettingsPanel({ settings: s, onChange, onGenerate, dirty }: Prop
         <div className="chips">
           {(Object.keys(RESTRICTION_LABELS) as Restriction[]).map((r) => (
             <label key={r} className="chip">
-              <input
-                type="checkbox"
-                checked={s.restrictions.includes(r)}
-                onChange={() => set('restrictions', toggle(s.restrictions, r))}
-              />
+              <input type="checkbox" checked={s.restrictions.includes(r)} onChange={() => set('restrictions', toggle(s.restrictions, r))} />
               <span>{RESTRICTION_LABELS[r]}</span>
             </label>
           ))}
@@ -155,10 +165,7 @@ export function SettingsPanel({ settings: s, onChange, onGenerate, dirty }: Prop
 
       <label className="field">
         <span>Temps de préparation max.</span>
-        <select
-          value={s.maxPrepMinutes ?? ''}
-          onChange={(e) => set('maxPrepMinutes', e.target.value ? Number(e.target.value) : null)}
-        >
+        <select value={s.maxPrepMinutes ?? ''} onChange={(e) => set('maxPrepMinutes', e.target.value ? Number(e.target.value) : null)}>
           <option value="">Pas de limite</option>
           {[20, 30, 45, 60].map((n) => (
             <option key={n} value={n}>
@@ -168,7 +175,7 @@ export function SettingsPanel({ settings: s, onChange, onGenerate, dirty }: Prop
         </select>
       </label>
 
-      <button type="submit" className="primary">
+      <button type="submit" className="pill dark block">
         {dirty ? 'Générer mes menus' : 'Proposer d’autres menus'}
       </button>
     </form>
