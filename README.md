@@ -40,13 +40,16 @@ L'app fonctionne sans cette étape. Pour activer la connexion :
 1. Créez un compte gratuit sur [supabase.com](https://supabase.com), puis **New project**.
 2. Dans le projet : **SQL Editor → New query**, collez le contenu de [`supabase/schema.sql`](supabase/schema.sql) et cliquez sur **Run**.
 3. **Authentication → URL Configuration** : mettez l'adresse de votre site Vercel dans **Site URL** (ex. `https://qu-est-ce-qu-on-mange.vercel.app`) et ajoutez-la aussi dans **Redirect URLs**.
-4. **Project Settings → API** : copiez la **Project URL** et la clé **anon public**.
+4. Récupérez deux informations :
+   - la **Project URL** (`https://xxxx.supabase.co`) : bouton **Connect** en haut du projet, ou **Project Settings → Data API** ;
+   - la **Publishable key** (`sb_publishable_…`) : **Project Settings → API Keys**.
+   ⚠️ N'utilisez jamais la **Secret key** dans l'app.
 5. Sur Vercel : **Settings → Environment Variables**, ajoutez :
    - `VITE_SUPABASE_URL` = la Project URL
-   - `VITE_SUPABASE_ANON_KEY` = la clé anon public
+   - `VITE_SUPABASE_PUBLISHABLE_KEY` = la Publishable key
 6. Redéployez sur Vercel (**Deployments → ⋯ → Redeploy**).
 
-La clé « anon » peut être publique : chaque utilisateur n'a accès qu'à ses propres données grâce aux règles de sécurité (RLS) créées à l'étape 2.
+La Publishable key peut être publique : chaque utilisateur n'a accès qu'à ses propres données grâce aux règles de sécurité (RLS) créées à l'étape 2.
 
 ## Organisation du code
 
